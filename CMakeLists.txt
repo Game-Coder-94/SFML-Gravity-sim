@@ -21,6 +21,8 @@ add_executable(main
     src/Satellite.hpp
     src/Physics.hpp
     src/Physics.cpp
+    src/Sim.hpp
+    src/Sim.cpp
 )
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)

@@ -14,6 +14,29 @@ void Sim::update(float dt)
 {
 	phy::computeGravity(*this);
 
+	// -- Controls --
+	
+	// Check for any bodies
+	if (!bodies.empty())
+	{
+		auto& player = bodies[0];	// Set 1st body as a player
+		float thrustPower = 100000.0f;	// Force applied per frame
+
+		// Check if keys currently being held down
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {	// W - key
+			player.net_force.y += thrustPower;	// upward force
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {	// S - key
+			player.net_force.y -= thrustPower;	// downward force
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {	// A - key
+			player.net_force.x -= thrustPower;	// leftward force
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {	// D - key
+			player.net_force.x += thrustPower;	// rightward force
+		}
+	}
+
 	for (auto& body : bodies) {
 
 		// Movement

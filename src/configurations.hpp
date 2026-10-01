@@ -12,6 +12,7 @@ namespace conf
 
 	// Physics configuration
 	float const GRAVITY_CONST = 6.6743 * pow(10, 2);
+	float const MAX_SPEED = 1000.0f;
 	
 
 	// Star configuration

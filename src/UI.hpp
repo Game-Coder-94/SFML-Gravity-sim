@@ -1,8 +1,11 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
+
+#include "Physics.hpp"
 
 // Computes points positions for a circle
 struct CircleGenerator
@@ -74,13 +77,58 @@ inline void generateCircle(sf::VertexArray& vertex_array, sf::Vector2f position,
 }
 
 // Adds rounded rectangle points inside a pre-allocated vertex array
-inline void generateRoundedRectangle(sf::VertexArray& vertex_array, sf::Vector2f position, sf::Vector2f size, float radius, uint32_t quality)
+inline void generateRoundedRectangle(sf::VertexArray& vertex_array, sf::Vector2f position, sf::Vector2f size, float radius, uint32_t quality, sf::Color color)
 {
 	// Create a generator
 	RoundedRectangleGenerator const generator{ size, radius, quality };
 	//Add the points to vertex array
 	for (uint32_t i = 0; i < quality; ++i) {
 		vertex_array[i].position = position + generator.getPoint(i);
-		vertex_array[i].color = sf::Color{ 117, 255, 136 };
+		vertex_array[i].color = color;
 	}
+}
+
+void drawVelocityBar(sf::RenderWindow& window, const phy::RigidBody& body, float maxSpeed = 1000.0f)
+{
+	// Current speed
+	float currentSpeed = body.velocity.length();
+
+	// ratio = current speed / max speed
+	// Map speed to a 0.0 -> 1.0 percentage scale (clamped so it doesn't break past the bar)
+	float speedRatio = currentSpeed / maxSpeed;
+	speedRatio = std::min(speedRatio, 1.0f);
+
+	// Define progress bar dimensions
+	float bgHeight = 10.0f;
+	float bgWidth = 300.0f;
+	float bgRadius = 4.0f;
+	sf::Vector2f bgPos = { 1410.0f, 130.0f };
+
+	float padding = 3.0f;
+	float fgMaxHeight = bgHeight - (2.0f * padding);
+	float fgMaxWidth = bgWidth - (2.0f * padding);
+	float fgRadius = bgRadius - padding;
+
+	float fgWidth = fgMaxWidth * speedRatio;
+
+	sf::Vector2f fgPos = {
+		bgPos.x + padding,
+		bgPos.y + padding
+	};
+
+	if (fgWidth < fgRadius * 2.0f) {
+		fgWidth = fgRadius * 2.0f;
+	}
+
+	// Background Track (Empty Bar)
+	sf::VertexArray bgBar(sf::PrimitiveType::TriangleFan, 8);
+	generateRoundedRectangle(bgBar, bgPos, { bgWidth, bgHeight }, bgRadius, 8, sf::Color(50, 50, 50, 180));
+
+	// Foreground Indicator (Filled Bar)
+	// The width changes dynamically: barWidth * speedRatio
+	sf::VertexArray fgBar(sf::PrimitiveType::TriangleFan, 8);
+	generateRoundedRectangle(fgBar, fgPos, { fgWidth, fgMaxHeight }, fgRadius, 8, sf::Color::White);
+
+	window.draw(bgBar);
+	if (speedRatio > 0.01f) { window.draw(fgBar); }
 }

@@ -24,10 +24,10 @@ int main()
 		
 	// initial stats
 	body1.velocity = { 0.0f, 0.0f };
-	body2.velocity = { 0.0f, -550.0f };
+	body2.velocity = { 0.0f, 250.0f };
 	
-	sim.addBody(body1);
 	sim.addBody(body2);
+	sim.addBody(body1);
 	
 	// -- UI --
 	// Rounded rectangle properties
@@ -37,7 +37,7 @@ int main()
 	uint32_t quality = 32;
 
 	sf::VertexArray va(sf::PrimitiveType::TriangleFan, 32);
-	generateRoundedRectangle(va, position, size, radius, quality);
+	generateRoundedRectangle(va, position, size, radius, quality, sf::Color(140, 230, 60));
 
 	// 1. Create a view that represents your physics space
 	// Arguments: Center X, Center Y, Width, Height
@@ -67,6 +67,7 @@ int main()
 
 		// UI rendering
 		window.draw(va);
+		drawVelocityBar(window, sim.getBodies()[0], conf::MAX_SPEED);
 
 		window.display();
 	}
